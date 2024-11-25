@@ -8,9 +8,9 @@ inputs:
   tag:
     description: "The tag (used in result file naming)."
     required: true
-outputs:
-  markdown_table:
-    description: "The generated Markdown table."
+  github_token:
+    description: "GitHub Token for authentication."
+    required: true
 runs:
   using: "composite"
   steps:
@@ -79,7 +79,7 @@ runs:
         
     - uses: LouisBrunner/checks-action@v2.0.0
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ inputs.github_token }}
         name: Test Results - CLI (${{ inputs.tag }})
         conclusion: success
         output: |

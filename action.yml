@@ -71,7 +71,30 @@ runs:
 
     - name: Write Markdown to GITHUB_OUTPUT
       shell: bash
+      id: set-markdown
       run: |
         markdown_table=$(<markdown_output.txt)
         escaped_markdown=$(echo "$markdown_table" | sed -E ':a;N;$!ba;s/\\/\\\\/g;s/"/\\"/g;s/\n/\\n/g')
         echo "markdown_table=$escaped_markdown" >> $GITHUB_OUTPUT
+        
+    - uses: LouisBrunner/checks-action@v2.0.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        name: Test Results - CLI (${{ inputs.tag }})
+        conclusion: success
+        output: |
+          {"summary":"${{ steps.set-markdown.outputs.markdown_table }}`"}
+          
+    # - name: upload-appinspect-report
+    #   if: ${{ !cancelled() }}
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: appinspect_${{ inputs.tag }}_checks.json
+    #     path: appinspect_result_${{ inputs.tag }}.json
+    # - name: upload-markdown
+    #   if: inputs.tag == 'manual'
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: check_markdown
+    #     path: |
+    #       *_markdown.txt

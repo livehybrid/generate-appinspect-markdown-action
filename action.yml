@@ -11,6 +11,10 @@ inputs:
   github_token:
     description: "GitHub Token for authentication."
     required: true
+  include_not_applicable:
+    description: "Include 'not_applicable' category in the output (true/false)."
+    required: false
+    default: "true"
 runs:
   using: "composite"
   steps:
@@ -23,6 +27,8 @@ runs:
 
         # Load the JSON file
         json_file = "${{ inputs.json_file }}"
+        include_not_applicable = "${{ inputs.include_not_applicable }}" == "true"
+
         with open(json_file, "r") as file:
             data = json.load(file)
 
@@ -38,8 +44,10 @@ runs:
             }
 
             # Add "warning" to the priority list
-            priority_order = ["failure", "warning", "success", "manual_check", "not_applicable"]
-
+            priority_order = ["failure", "warning", "success", "manual_check"]
+            if include_not_applicable:
+              priority_order.append("not_applicable")
+              
             # Sort checks by priority
             checks = []
             for group in report.get("groups", []):

@@ -15,6 +15,10 @@ inputs:
     description: "Include 'not_applicable' category in the output (true/false)."
     required: false
     default: "true"
+  message_trim:
+    description: "The number of chars to limit each message cell to in order to reduce risk of going over actions document size (Default: 1000)"
+    required: false
+    default: 1000
 runs:
   using: "composite"
   steps:
@@ -28,7 +32,8 @@ runs:
         # Load the JSON file
         json_file = "${{ inputs.json_file }}"
         include_not_applicable = "${{ inputs.include_not_applicable }}" == "true"
-
+        message_trim = int(${{ inputs.message_trim }})
+        
         with open(json_file, "r") as file:
             data = json.load(file)
 
@@ -54,6 +59,8 @@ runs:
                 if isinstance(group, dict):  # Ensure group is a dictionary
                     for check in group.get("checks", []):
                         messages = [message.get("message", "") for message in check.get("messages", [])]
+                        messages = messages if len(messages) < message_trim else messages[:message_trim - 3] + '...'
+                        
                         result = check.get("result", "not_applicable")
                         if result in priority_order:
                             checks.append(

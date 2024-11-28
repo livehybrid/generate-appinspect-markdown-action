@@ -18,7 +18,7 @@ inputs:
   message_trim:
     description: "The number of chars to limit each message cell to in order to reduce risk of going over actions document size (Default: 1000)"
     required: false
-    default: 1000
+    default: 250
 runs:
   using: "composite"
   steps:

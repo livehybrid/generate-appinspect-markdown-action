@@ -18,7 +18,7 @@ inputs:
   message_trim:
     description: "The number of chars to limit each message cell to in order to reduce risk of going over actions document size (Default: 1000)"
     required: false
-    default: 250
+    default: 500
 runs:
   using: "composite"
   steps:
@@ -59,15 +59,17 @@ runs:
                 if isinstance(group, dict):  # Ensure group is a dictionary
                     for check in group.get("checks", []):
                         messages = [message.get("message", "") for message in check.get("messages", [])]
-                        messages = messages if len(messages) < message_trim else messages[:message_trim - 3] + '...'
                         
                         result = check.get("result", "not_applicable")
                         if result in priority_order:
+                            combined_messages = "<br>".join(messages)
+                            combined_messages = combined_messages if len(combined_messages) < message_trim else combined_messages[:message_trim - 3] + '...'
+                        
                             checks.append(
                                 {
                                     "name": check.get("name", "N/A"),
                                     "result": result,
-                                    "messages": "<br>".join(messages),
+                                    "messages": combined_messages,
                                 }
                             )
 
